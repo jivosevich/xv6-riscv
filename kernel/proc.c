@@ -124,6 +124,7 @@ allocproc(void)
 found:
   p->pid = allocpid();
   p->state = USED;
+  p->priority = 0;
 
   // Allocate a trapframe page.
   if((p->trapframe = (struct trapframe *)kalloc()) == 0){
@@ -452,22 +453,33 @@ scheduler(void)
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
 
+    int high_priority = -1;
+    struct proc *high_priority_proc = 0;
+
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
-      if(p->state == RUNNABLE) {
-        // Switch to chosen process.  It is the process's job
-        // to release its lock and then reacquire it
-        // before jumping back to us.
-        p->state = RUNNING;
-        c->proc = p;
-        swtch(&c->context, &p->context);
-
-        // Process is done running for now.
-        // It should have changed its p->state before coming back.
-        c->proc = 0;
+      if(p->state == RUNNABLE && p->priority > high_priority) {
+        // Choose the process RUNNABLE with the highest priority
+        high_priority_proc = p;
+        high_priority = p->priority;
       }
       release(&p->lock);
     }
+
+    // If it found a process, then change tor the selected process
+    if(high_priority_proc != 0) {
+      acquire(&high_priority_proc->lock);
+      if(high_priority_proc->state == RUNNABLE){
+        high_priority_proc->state = RUNNING;
+        c->proc = high_priority_proc;
+        //Context switch
+        swtch(&c->context, &high_priority_proc->context);
+
+        c->proc = 0; 
+      }
+      // Release the highest process when finished
+      release(&high_priority_proc->lock);
+    } 
   }
 }
 
@@ -680,4 +692,21 @@ procdump(void)
     printf("%d %s %s", p->pid, state, p->name);
     printf("\n");
   }
+}
+
+// New syscall set_priority
+int 
+set_priority(int priority, int pid){
+  struct proc *p;
+  //Check if the priority exist
+  for(p = proc; p < &proc[NPROC]; p++){
+    acquire(&p->lock);
+    if(p->pid == pid){ //If exist...
+      p->priority = priority;
+      release(&p->lock);
+      return 0; // Return success
+    }
+    release(&p->lock);
+  }
+  return -1; // if it doesn´t return error (PID doesn´t found)
 }
