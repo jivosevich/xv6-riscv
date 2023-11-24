@@ -135,6 +135,7 @@ UPROGS=\
 	$U/_zombie\
 	$U/_getppid\
 	$U/_generate\
+	$U/_tarea4memoria\
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
