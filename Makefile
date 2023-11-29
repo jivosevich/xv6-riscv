@@ -136,6 +136,8 @@ UPROGS=\
 	$U/_getppid\
 	$U/_generate\
 	$U/_set_priority\
+	$U/_tarea3\
+
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)

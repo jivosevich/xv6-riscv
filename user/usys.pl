@@ -38,3 +38,5 @@ entry("sleep");
 entry("uptime");
 entry("ancestor");
 entry("set_priority");
+entry("mprotect");
+entry("munprotect");

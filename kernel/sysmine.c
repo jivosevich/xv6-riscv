@@ -7,6 +7,7 @@
 #include "proc.h"
 #include "syscall.h"
 #include "defs.h"
+#include <stdint.h>
 
 int ancestor(int gen) {
   struct proc *p = myproc();
@@ -40,4 +41,24 @@ uint64 sys_set_priority(void){
     argint(0, &proc_id);
     argint(1, &priority);
     return set_priority(priority, proc_id);
+}
+
+uint64 sys_mprotect(void){
+    int addr;
+    int len;
+    argint(0, &addr);
+    argint(1, &len);
+
+    uintptr_t addr_ptr = (uintptr_t)addr;
+    return mprotect((void*) addr_ptr, len);
+}
+
+uint64 sys_munprotect(void){
+    int addr;
+    int len;
+    argint(0, &addr);
+    argint(1, &len);
+
+    uintptr_t addr_ptr = (uintptr_t)addr;
+    return munprotect((void*) addr_ptr, len);
 }

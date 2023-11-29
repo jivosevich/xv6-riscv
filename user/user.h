@@ -24,7 +24,9 @@ int sleep(int);
 int uptime(void);
 int ancestor(int);
 int set_priority(int, int);
-
+int chmod(char , int);
+int mprotect(void*, int);
+int munprotect(void*, int);
 
 // ulib.c
 int stat(const char*, struct stat*);
