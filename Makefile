@@ -137,6 +137,7 @@ UPROGS=\
 	$U/_generate\
 	$U/_set_priority\
 	$U/_tarea3\
+	$U/_tarea4\
 
 
 fs.img: mkfs/mkfs README $(UPROGS)

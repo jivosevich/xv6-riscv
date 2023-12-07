@@ -483,13 +483,6 @@ scheduler(void)
   }
 }
 
-// Switch to scheduler.  Must hold only p->lock
-// and have changed proc->state. Saves and restores
-// intena because intena is a property of this
-// kernel thread, not this CPU. It should
-// be proc->intena and proc->noff, but that would
-// break in the few places where a lock is held but
-// there's no process.
 void
 sched(void)
 {
@@ -634,9 +627,6 @@ killed(struct proc *p)
   return k;
 }
 
-// Copy to either a user address, or kernel address,
-// depending on usr_dst.
-// Returns 0 on success, -1 on error.
 int
 either_copyout(int user_dst, uint64 dst, void *src, uint64 len)
 {
@@ -649,9 +639,7 @@ either_copyout(int user_dst, uint64 dst, void *src, uint64 len)
   }
 }
 
-// Copy from either a user address, or kernel address,
-// depending on usr_src.
-// Returns 0 on success, -1 on error.
+
 int
 either_copyin(void *dst, int user_src, uint64 src, uint64 len)
 {
@@ -664,9 +652,7 @@ either_copyin(void *dst, int user_src, uint64 src, uint64 len)
   }
 }
 
-// Print a process listing to console.  For debugging.
-// Runs when user types ^P on console.
-// No lock to avoid wedging a stuck machine further.
+
 void
 procdump(void)
 {
@@ -694,19 +680,19 @@ procdump(void)
   }
 }
 
-// New syscall set_priority
+
 int 
 set_priority(int priority, int pid){
   struct proc *p;
-  //Check if the priority exist
+
   for(p = proc; p < &proc[NPROC]; p++){
     acquire(&p->lock);
-    if(p->pid == pid){ //If exist...
+    if(p->pid == pid){ 
       p->priority = priority;
       release(&p->lock);
-      return 0; // Return success
+      return 0; 
     }
     release(&p->lock);
   }
-  return -1; // if it doesn´t return error (PID doesn´t found)
+  return -1; 
 }

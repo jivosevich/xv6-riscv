@@ -40,3 +40,4 @@ entry("ancestor");
 entry("set_priority");
 entry("mprotect");
 entry("munprotect");
+entry("chmod");

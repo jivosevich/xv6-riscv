@@ -335,6 +335,12 @@ sys_open(void)
     }
   }
 
+  int mode = ip->mode;
+  if ((omode == O_RDONLY && mode != 1) || (omode == O_WRONLY && mode != 2)) {
+    return -1; 
+  } 
+
+
   if(ip->type == T_DEVICE && (ip->major < 0 || ip->major >= NDEV)){
     iunlockput(ip);
     end_op();
@@ -502,4 +508,32 @@ sys_pipe(void)
     return -1;
   }
   return 0;
+}
+
+
+typedef struct {
+    char file[MAXPATH];
+    int custom_mode;
+} ChmodParams;
+
+uint64 
+sys_chmod(void) {
+    ChmodParams params;
+
+    argstr(0, params.file, sizeof(params.file));
+    argint(1, &params.custom_mode);
+
+    if (params.file[0] == '\0' || params.custom_mode < 0)
+        return -1;
+
+    struct inode* ip = namei(params.file);
+
+    if (ip == 0) {
+        return -1;
+    }
+
+    ilock(ip);
+    ip->mode = params.custom_mode;
+    iunlock(ip);
+    return 1;
 }
